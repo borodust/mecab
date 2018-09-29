@@ -45,10 +45,17 @@ test -n "$NO_AUTOCONF" || (autoheader --version) < /dev/null > /dev/null 2>&1 ||
   DIE=1
 }
 
+if [ -z "$LIBTOOLIZE" ]; then
+  LIBTOOLIZE=`which glibtoolize 2>/dev/null`
+  if [ ! -x "$LIBTOOLIZE" ]; then
+    LIBTOOLIZE=`which libtoolize`
+  fi
+fi
+
 (grep "^AM_PROG_LIBTOOL" configure.in >/dev/null) && {
-  (libtool --version) < /dev/null > /dev/null 2>&1 || {
+  ($LIBTOOLIZE --version) < /dev/null > /dev/null 2>&1 || {
     echo
-    echo "**Error**: You must have \`libtool' installed to compile Gnome."
+    echo "**Error**: You must have \`libtoolize' installed to compile MeCab."
     echo "Get ftp://ftp.gnu.org/pub/gnu/libtool-1.3.tar.gz"
     echo "(or a newer version if it is available)"
     DIE=1
@@ -70,7 +77,7 @@ echo "Generating configure script and Makefiles for MeCab."
 
 if grep "^AM_PROG_LIBTOOL" configure.in >/dev/null; then
   echo "Running libtoolize..."
-  libtoolize --force --copy
+  $LIBTOOLIZE --force --copy
 fi
 echo "Running aclocal ..."
 aclocal -I .
